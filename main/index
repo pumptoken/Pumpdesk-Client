@@ -1,0 +1,1020 @@
+	
+	<!DOCTYPE html>
+	<html>
+	<head>
+	  <meta charset="utf-8">
+	  <title>Pumpdesk Client</title>
+	  <meta name="viewport" content="width=device-width, initial-scale=1">
+	  
+	  <link rel="stylesheet" href="../angular/angular-csp.css">
+	  <link rel="stylesheet" href="../angular-material/angular-material.css">
+	  <link rel="stylesheet" href="../css/style.css">
+	  
+	  <link href="img/favicon.ico" type="image/x-icon" rel="shortcut icon">
+	</head>
+	
+	<body ng-controller="homeController as home" ng-switch on="home.screen">
+	
+	
+	<div ng-controller="splashController as splash" id="bg-spin" class="noSelect" ng-show="home.screen === 'splash-screen'">
+	  <div id="logo-container-centered" class="centerIt">
+	    <div id="logoo">
+	      <img id="logo-spin" src="img/logo-spin.svg" />
+	      <p id="networkCheck">Please Wait,Loading...</p>
+	    </div>
+	  </div>
+	</div>
+	
+	
+	<div id="lockscreen" class="userBG" ng-controller="accountsController as accounts" ng-switch-when="accounts-screen" ng-cloak>
+	  <table id="lockscreenTable">
+	
+	    <thead>
+	    <div id="logoNversion">
+	      <img src="img/topleftlogo.svg" />
+	      <p ng-class='{testnet: isTestnet()}'>{{::home.title}} <span class="wlcversion">{{::home.version}}</span></p>
+	    </div>
+	    </thead>
+	
+	    <tbody>
+	    <tr>
+	      <td>
+	        <!-- Accounts -->
+	        <div id="accounts">
+	          <h2 id="AccHeader">{{accounts.caption}}</h2>
+	          <div class="pumpAccounts" ng-controller="accountListController as list" ng-show="accounts.mode === 'list'">
+	
+	
+	
+	
+	              <span class="clipSpan" tooltipster tooltip-theme="tooltipster-theme1" ngclipboard title="Copy  address ." data-clipboard-text="{{::account.address}}" ngclipboard-success="clipboardOk()"></span>
+	              <span class="divider-1"></span>
+	              <button class="removeAccount wButtonAlt fade" tooltipster tooltip-theme="tooltipster-theme1" title="Remove Account." ng-click="list.showRemoveWarning($index)">
+	                <span class="wButton-icon"><img src="img/wIcon_x.svg"></span>PROCEED
+	              </button>
+	            </p>
+	
+	            <button id="Login" class="wButton fade" tooltipster tooltip-theme="tooltipster-theme1" ng-click="list.login()">Login</button>
+	            <span class="divider-1"></span>
+	            <button id="create_account" class="wButton fade" tooltipster tooltip-theme="tooltipster-theme1" title="Create new account." ng-click="list.createAccount()">Sign Up</button>
+	            <br/>
+	
+	          
+	            <div id="account-remove-popup" is-error="true" ok-button-caption="REMOVE">
+	              <h2 class="sectionHeader">REMOVE ACCOUNT - NOTICE</h2>
+	              <p class="dialog-text">Are You Sure You Want To Remove This Account.</p>
+	              <p class="dialog-text">NB: This Account will not be permanently deleted and can be accessed anytime </p>
+	
+	              <p class="dialog-text">Click on PROCEED to continue  with the account removal, or CANCEL to return to the previous screen.</p>
+	            </div>
+	          </div>
+	
+	          <!-- Seed input -->
+	          <div id="create-seed" ng-controller="accountSeedController as vm" ng-show="accounts.mode === 'create-seed'">
+	            <form id="account-seed-form" name="accountSeedForm" ng-submit="vm.checkSeedAndRegister(accountSeedForm)" novalidate ng-validate="vm.validationOptions">
+	
+	              <button id="generateRandomSeed" class="wButton fade" ng-click="vm.generateSeed()" type="button">GENERATE NEW SEED</button>
+	              <br/><br/>
+	              <div class="form-field">
+	                <label for="passphrase">PASSPHRASE</label>
+	                <br/>
+	                <textarea id=" passphrase " rows="4" name="passphrase" class="wInput" focus-me="accounts.mode === 'create-seed'" ng-model="vm.seed" ng-change="vm.refreshAddress()" ng-model-options="{ debounce: 750 }" ng-trim="false"></textarea>
+	                <span class="clipSpan" tooltipster tooltip-theme="tooltipster-theme1" title="Copy Passphrase to  clipboard." data-clipboard-target="#walletSeed" data-clipboard-message-success="Passphrase successfully copied to clipboard" ></span>
+	                <br/>
+	              </div>
+	              <br/>
+	
+	              <div class="wPop-content">
+	                <div>ADDRESS(BTC/ETH/PUMPS/UBIQ/NEO)
+	                  <br/>
+	                  <span>{{vm.displayAddress}}</span>
+	                </div>
+	              </div>
+	              <button class="wButton fade" type="submit">REGISTER ACCOUNT</button>
+	              <span class="divider-2"></span>
+	              <button class="wButton fade" type="reset" ng-click="vm.back()">BACK</button>
+	
+	              <div id="seed-whitespace-popup" pump-dialog on-dialog-ok="vm.registerAccount()" closeable="false" ok-button-caption="PROCEED">
+	                <h2 class="sectionHeader">Passphrae</h2>
+	                <p class="dialog-text">Be sure to copy and save your passphrase before continuing.</p>
+	                <p class="dialog-text">Passphrase can’t be recovered. Proceed Only if you’re sure that it has been saved </br> </p>
+	
+	
+	              </div>
+	            </form>
+	          </div>
+	
+	          <div id="login-wPop-new" ok-button-caption="I UNDERSTAND" on-dialog-ok="" cancel-button-visible="false" closeable="false">
+	            <h2 class="sectionHeader">NEW ACCOUNT - NOTICE</h2>
+	            <p class="dialog-text">This feature involves the creation of a new account on Pump client platform.</p>
+	            <p class="dialog-text">This account will give you access to the Pump deskclient, web platform and mobile app portals.</p>
+	            <p class="dialog-text">This SEED is extremely important and must be kept in safe place, since it's the only way to recover your account in case of lost, corrupted data or hardware failure.</p>
+	            <
+	              <br/><br/>
+	              
+	          </div>
+	
+	          <!-- store account on the current device -->
+	          <div id="register" ng-controller="accountRegisterController as vm" ng-show="accounts.mode === 'register'">
+	            <form id="register-form" name="registerForm" novalidate ng-submit="vm.saveAccountAndSignIn(registerForm)" ng-validate="vm.validationOptions">
+	              <div class="wPop-content">
+	                <label for="readonlySeed">Passphrase</label>
+	                <br/>
+	                <textarea id="readonlySeed" rows="4" class="wInput" ng-model="vm.seed" ng-model-options="{ getterSetter: true }" readonly></textarea>
+	                <br/><br/>
+	                <div>ADDRESS
+	                  <br/>
+	                  <span>{{accounts.displayAddress}}</span>
+	                </div>
+	                <br/>
+	
+	                <div class="form-field">
+	                  <label for="walletName">
+	                    NAME<span class="infoSpan" tooltipster tooltip-theme="tooltipster-theme1" tooltip-html title="It is possible to assign a name to your account(s)
+	
+	                <br/>
+	                  </label>
+	                  <input type="text" id="walletName" name="walletName" class="wInput" ng-model="vm.name" focus-me="accounts.mode === 'register'"/>
+	                </div>
+	                <br/>
+	                <div class="form-field">
+	                  <label for="walletPassword">
+	                    PASSWORD<span class="infoSpan" tooltipster tooltip-theme="tooltipster-theme1" tooltip-html title="Used to encrypt your wallet Passphrase, the password
+	
+	                  </label>
+	                  <br/>
+	                  <input type="password" id="walletPassword" name="walletPassword" class="wInput" ng-model="vm.password"/>
+	                </div>
+	                <br/>
+	                <div class="form-field">
+	                  <label for="walletPasswordConfirm">REPEAT PASSWORD</label>
+	                  <br/>
+	                  <input type="password" id="walletPasswordConfirm" name="walletPasswordConfirm" class="wInput" ng-model="vm.confirmPassword"/>
+	                </div>
+	                <br/>
+	
+	                <button class="wButton fade" type="submit">REGISTER</button>
+	                <span class="divider-2"></span>
+	                <button class="wButton fade" type="reset" ng-click="vm.cancel()">CANCEL</button>
+	              </div>
+	            </form>
+	          </div>
+	          <!-- log in to selected account -->
+	          <div id="account-login" ng-controller="accountLoginController as vm" ng-show="accounts.mode === 'login'">
+	            <form id="login-form">
+	              <div>ACCOUNT
+	                <br/>
+	                <span>{{accounts.displayAddress}}</span>
+	              </div>
+	              <br/>
+	
+	              <label for="accountPassword">PASSWORD</label>
+	              <br/>
+	
+	              <input type="password" id="accountPassword" class="wInput" ng-model="vm.password" focus-me="accounts.mode === 'login'"/>
+	              <br/><br/>
+	
+	              <button class="wButton fade" ng-click="vm.signIn()">LOG IN</button>
+	              <span class="divider-2"></span>
+	              <button class="wButton fade" ng-click="vm.cancel()">CANCEL</button>
+	            </form>
+	          </div>
+	        </div>
+	      </td>
+	    </tr>
+	    </tbody>
+	
+	  </table>
+	</div>
+	
+
+	
+	  </div>
+	  <!-- /shared blocks-->
+	
+	  <!-- HEADER -->
+	  <header class="fFade noSelect" ng-controller="mainMenuController as menu">
+	    <img id="topLogoH" src="img/pumptoken.png" alt="Pump " />
+	    <div id="logoNversion2">
+	      <img src="img/topleftlogo.svg" />
+	      <p ng-class='{testnet: isTestnet()}'>{{::home.title}} <span class="wlcversion">{{::home.version}}</span></p>
+	    </div>
+	    <span id="version" class="centerIt">Address:
+	                <span id="pumpAddress" class="clipSpan" tooltipster tooltip-theme="tooltipster-theme3" title="Copy the address to clipboard." ngclipboard data-clipboard-text="{{::menu.address}}" ngclipboard-success="clipboardOk()">{{::menu.address}}</span>
+	                <span class="divider-2"></span>
+	                <span class="inlineParagraph">Block:</span> <span id="blockheight">{{menu.blockHeight}}</span>
+	            </span>
+	
+	    <div id="header-Iconset">
+	      <a ng-click="menu.showBackupDialog()">
+	        <img class="header-Icon fade" tooltipster tooltip-theme="tooltipster-theme2" src="img/pump-b.png" alt="Backup" title="Backup"/>
+	      </a>
+	
+	    <!-- APPLICATION TAB  -->
+	    <section id="tabs" class="fFade noSelect">
+	      <div id="tabs-Iconset" class="centerIt">
+	                    <span PUMP-tab
+	                          on-select="nav.changeTab(pageId)"
+	                          current-page-id="nav.currentTab"
+	                          page-id="wallet"
+	                          caption="'Wallet tab'"
+	                          tooltipster
+	                          tooltip-html
+	                          tooltip-theme="tooltipster-theme3"
+	                          tooltip-title="<center><u>Wallet</u></center><br/>Area containing All Your Walletd."></span>
+	        <span Pump-tab
+	              on-select="nav.changeTab(pageId)"
+	              current-page-id="nav.currentTab"
+	              page-id="Insurance"
+	              caption="'Insurance tab'"
+	              tooltipster
+	              tooltip-html
+	              tooltip-theme="tooltipster-theme2"
+	              tooltip-title="<center><u>INSURANCE</u></center><br/>Display all your cryptoassets,<br/>insurance packages available and your insurance transactions."></span>
+	        <span pump-tab
+	              on-select="nav.changeTab(pageId)"
+	              current-page-id="nav.currentTab"
+	              page-id="Dec-exchange"
+	              caption="'Exchange tab'"
+	              tooltipster
+	              tooltip-html
+	              tooltip-theme="tooltipster-theme2"
+	              tooltip-title="<center><u>Pump Decentralized Exchange</u></center><br/>Access to all supported token markets(btc,eth,pumps,ubiq and neo)<br/>conveniently buy, sell and trade tokens."></span>
+	        <span pump-tab
+	              on-select="nav.changeTab(pageId)"
+	              current-page-id="nav.currentTab"
+	              page-id="Voting "
+	              caption="Pump Decentralised Voting'"
+	              tooltipster
+	              tooltip-html
+	              tooltip-theme="tooltipster-theme2"
+	              tooltip-title="<center><u>Leasing</u></center><br/>You’ll be able to vote here ."></span>
+	
+	
+	        <span pump-tab
+	              on-select="nav.changeTab(pageId)"
+	              current-page-id="nav.currentTab"
+	              page-id="history"
+	              caption="'History tab'"
+	              tooltipster
+	              tooltip-html
+	              tooltip-theme="tooltipster-theme2"
+	              tooltip-title="<center><u>History</u></center><br/>Access all your transaction records."></span>
+	        <span pump-tab
+	              on-select="nav.changeTab(pageId)"
+	              current-page-id="nav.currentTab"
+	              page-id="tokens"
+	              caption="'Tokens Addition tab'"
+	              tooltipster
+	              tooltip-html
+	              tooltip-theme="tooltipster-theme3"
+	              tooltip-title="<center><u>Tokens Addition tab</u></center><br/>You can add your tokens here to the exchange "></span>
+	
+	
+	    <section id="mainBody" class="wScroll">
+	      <!-- BODY CONTENT -->
+	      <section id="mBBody" class="fFade" ng-switch on="nav.currentTab">
+	        <!-- WALLET TAB -->
+	        <div id="mBB-wallet" class="mBB-content" ng-switch-when="wallet" ng-controller="walletListController as walletList">
+	
+	          <div class="noDisp" ng-controller="walletSendController as send">
+	            <div id="wB-butSend-PUMP" pump-dialog ok-button-caption="SUBMIT" cancel-button-visible="false" on-dialog-ok="send.submitTransfer(send.form)">
+	              <form id="send-pump-form" name="send.form" class="paymentForm" novalidate ng-validate="send.validationOptions">
+	                <h2 class="sectionHeader">SEND PAYMENT: {{send.currency}}</h2>
+	                <table>
+	                  <div class="balanceAmt">
+	                    <div ng-if="!send.feeAndTransferAssetsAreTheSame"><p>balance: </p><span class="balancepumps">{{send.assetBalance | moneyLong:true}}</span><br/></div>
+	                    <p>Pumptoken balance: </p><span class="balancepumps">{{send.feeAssetBalance | moneyLong:true}}</span>
+	                  </div>
+	                  <thead>
+	                  <tr>
+	                    <th>DESCRIPTION</th>
+	                    <th>INPUT</th>
+	                  </tr>
+	                  </thead>
+	                  <tbody>
+	                  <tr>
+	                    <td>Recipient's Address</td>
+	                    <td>
+	                      <div class="form-field">
+	                        <input class="wInput form-control" name="sendRecipient" type="text" placeholder="Recipient" ng-model="send.recipient" />
+	                      </div>
+	                    </td>
+	                  </tr>
+	                  <tr>
+	                    <td>Amount</td>
+	                    <td>
+	                      <div class="form-field">
+	                        <input class="wInput form-control" name="sendAmount" type="text" placeholder="Amount" ng-model="send.amount" decimal-input-restrictor />
+	                      </div>
+	                    </td>
+	                  </tr>
+	                  <tr>
+	                    <td>Attachment</td>
+	                    <td>
+	                      <div class="form-field">
+	                        <textarea rows="2" class="wInput form-control" name="sendAttachment" ng-model="send.attachment"></textarea>
+	                      </div>
+	                    </td>
+	                  </tr>
+	                  <tr>
+	                    <td>Fee</td>
+	                    <td>
+	                      <md-autocomplete md-input-name="sendFee" md-selected-item="send.autocomplete.selectedFee" md-search-text="send.autocomplete.searchText"
+	                                       md-items="item in send.autocomplete.querySearch(send.autocomplete.searchText)"
+	                                       md-item-text="item.amount.toString()" md-min-length="0" md-require-match="" md-no-cache="true"
+	                                       md-menu-class="popup-autocomplete" class="fee-autocomplete">
+	                        <md-item-template>
+	                          <span md-highlight-text="send.autocomplete.searchText">{{item.displayText}}</span>
+	                        </md-item-template>
+	                      </md-autocomplete>
+	                    </td>
+	                  </tr>
+	                  </tbody>
+	                </table>
+	              </form>
+	            </div>
+	            <div id="send-payment-confirmation" pump-dialog ok-button-caption="CONFIRM" ok-button-enabled="!send.broadcast.pending" on-dialog-ok="send.broadcastTransaction()">
+	              <div class="dialog-confirmation">
+	                <p class="dialog-text">You are sending <span class="confirmation-value">{{send.confirm.amount | moneyLong:true}}</span> with
+	                  <span class="confirmation-value">{{send.confirm.fee | moneyLong:true}}</span> fee to the address<br/>
+	                  <span class="confirmation-value">{{send.confirm.recipient}}</span>
+	                </p>
+	                <p class="dialog-text">Please <span class="fontBold"> CONFIRM </span>to execute or <span class="fontBold"> CANCEL </span> to discard.</p>
+	              </div>
+	            </div>
+	          </div>
+	
+	          <div class="noDisp" ng-controller="walletWithdrawController as withdraw" data-type="crypto">
+	            <div id="withdraw-crypto-dialog" pumps-dialog ok-button-caption="WITHDRAW" on-dialog-ok="withdraw.confirmWithdraw(withdraw.assetForm)">
+	              <h2 class="sectionHeader">WITHDRAW: {{withdraw.sourceCurrency}}</h2>
+	              <p class="dialog-text" ng-if="withdraw.isEthereum">Do not withdraw ETH to smart contract addresses</p>
+	              <form id="withdraw-asset-form" name="withdraw.assetForm" novalidate ng-validate="withdraw.validationOptions">
+	                <table class="form-table">
+	                  <div class="balanceAmt">
+	                    <div><p>balance: </p><span class="balancepump">{{withdraw.assetBalance | moneyLong:true}}</span><br/></div>
+	                  </div>
+	                  <tbody>
+	                  <tr>
+	                    <td width="30%">{{withdraw.sourceCurrency}} address</td>
+	                    <td><input class="wInput form-control" name="withdrawAddress" type="text" placeholder="{{withdraw.sourceCurrency}} address" ng-model="withdraw.recipient"/></td>
+	                  </tr>
+	                  <tr>
+	                    <td>Amount</td>
+	                    <td><input class="wInput form-control" name="withdrawAmount" type="text" placeholder="Withdraw amount" ng-model="withdraw.amount" ng-change="withdraw.refreshTotal()" decimal-input-restrictor/></td>
+	                  </tr>
+	                  <tr>
+	                    <td>Gateway fee</td>
+	                    <td><input disabled class="wInput form-control" name="gatewayFee" type="text" placeholder="Gateway fee" ng-model="withdraw.feeOut" decimal-input-restrictor/></td>
+	                  </tr>
+	                  <tr>
+	                    <td>Total</td>
+	                    <td><input class="wInput form-control" name="withdrawTotal" type="text" placeholder="Total amount" ng-model="withdraw.total" ng-change="withdraw.refreshAmount()" decimal-input-restrictor/></td>
+	                  </tr>
+	                  <tr>
+	                    <td class="padded">Pumps fee</td>
+	                    <td class="padded">
+	                      <md-autocomplete md-input-name="withdrawFee" md-selected-item="withdraw.autocomplete.selectedFee" md-search-text="withdraw.autocomplete.searchText"
+	                                       md-items="item in withdraw.autocomplete.querySearch(withdraw.autocomplete.searchText)"
+	                                       md-item-text="item.amount.toString()" md-min-length="0" md-require-match="" md-no-cache="true"
+	                                       md-menu-class="popup-autocomplete" class="fee-autocomplete">
+	                        <md-item-template>
+	                          <span md-highlight-text="withdraw.autocomplete.searchText">{{item.displayText}}</span>
+	                        </md-item-template>
+	                      </md-autocomplete>
+	                    </td>
+	                  </tr>
+	                  </tbody>
+	                </table>
+	              </form>
+	            </div>
+	            <div id="withdraw-confirmation" pumps-dialog ok-button-caption="CONFIRM" ok-button-enabled="!withdraw.broadcast.pending" on-dialog-ok="withdraw.broadcastTransaction()">
+	              <div class="dialog-confirmation">
+	                <p class="dialog-text">You are sending <span class="confirmation-value">{{withdraw.confirm.amount | moneyLong:true}}</span> with
+	                  <span class="confirmation-value">{{withdraw.confirm.fee | moneyLong:true}}</span> fee to the Pumps gateway address <br/>
+	                  <span class="confirmation-value">{{withdraw.confirm.gatewayAddress}}</span>.
+	                </p>
+	                <p class="dialog-text">The gateway will transfer these funds to your {{withdraw.sourceCurrency}} address: <span class="confirmation-value">{{withdraw.confirm.recipient}}</span>.</p>
+	                <p class="dialog-text">Press <span class="fontBold"> CONFIRM </span>to execute or <span class="fontBold"> CANCEL </span> to discard this operation.</p>
+	              </div>
+	            </div>
+	          </div>
+	
+	          <div class="noDisp" ng-controller="walletWithdrawController as withdraw" data-type="fiat">
+	            <div id="withdraw-fiat-dialog" pumps-dialog ok-button-caption="CLOSE" cancel-button-visible="false">
+	              <h2 class="sectionHeader">WITHDRAW: {{withdraw.sourceCurrency}}</h2>
+	              <p class="dialog-text textCenter">
+	                If you've been verified and deposited {{withdraw.sourceCurrency}}<br/>
+	                you can withdraw {{withdraw.sourceCurrency}} back to your bank account<br/>
+	                <br/>
+	                To do so please make a SEND transaction to the<br/>
+	                Pumps address <span class="email"
+	                                    title="Copy this address to the clipboard"
+	                                    tooltipster
+	                                    tooltip-theme="tooltipster-theme1"
+	                                    ngclipboard
+	                                    data-clipboard-text="3P7qtv5Z7AMhwyvf5sM6nLuWWypyjVKb7Us"
+	                                    ngclipboard-success="clipboardOk()">3P7qtv5Z7AMhwyvf5sM6nLuWWypyjVKb7Us</span><br/>
+	                <br/>
+	                Fees are 1% from the amount transferred<br/>
+	                <br/>
+	                The minimum amount is 100 {{withdraw.sourceCurrency}}<br/>
+	                <br/>
+	                Bank transfer can take up to 3 working days
+	              </p>
+	              <br/>
+	              <p class="dialog-text textCenter">
+	                If you have any questions,<br/>
+	                please just send an email to<br/>
+	                <span class="email"
+	                      title="Copy this address to the clipboard"
+	                      tooltipster
+	                      tooltip-theme="tooltipster-theme1"
+	                      ngclipboard
+	                      data-clipboard-text="{{withdraw.gatewayEmail}}"
+	                      ngclipboard-success="clipboardOk()">{{withdraw.gatewayEmail}}</span>
+	              </p>
+	            </div>
+	          </div>
+	
+	          <div class="noDisp" ng-controller="walletDepositController as deposit" data-currency="BTC">
+	            <div id="deposit-btc-dialog" pumps-dialog ok-button-caption="CLOSE" cancel-button-visible="false">
+	              <h2 class="sectionHeader">DEPOSIT: BTC</h2>
+	              <p class="dialog-text textCenter">
+	                <img src="img/visa_mastercard_116x35.gif" width="116" height="35"><span class="divider-2"></span>
+	                <button class="wButton wButton-dialog" ng-click="walletList.depositFromCard(deposit.assetBalance.currency)">
+	                  Buy BTC from your credit card
+	                </button>
+	              </p>
+	              <p class="dialog-text">To deposit BTC to your Pumps account, please send BTC to the address below.<br/>
+	                The minimum amount of deposit is <span class="fontBold">{{::deposit.btc.minimumAmount}} BTC</span>.</p>
+	              <table class="pumpsTable bitcoin-requisites">
+	                <tbody>
+	                <tr>
+	                  <td><b>{{deposit.btc.bitcoinAddress}}</b></td>
+	                </tr>
+	                </tbody>
+	              </table>
+	              <p class="dialog-text">Enter this address into your Bitcoin client or wallet. Once the transaction is confirmed, <br/>
+	                the gateway will process the transfer of BTC to a token in your Pumps account.</p>
+	              <p class="dialog-text">Please note that the gateway doesn't apply any fees for this operation.</p>
+	              <p class="dialog-text">You can scan this QR-code in order to copy the address.<br/>
+	                Amount is optional but it will be added to the QR-code if present.</p>
+	              <div class="textCenter">
+	                <input class="wInput small" type="text" placeholder="Amount" ng-model="deposit.btc.bitcoinAmount" ng-change="deposit.refreshBTCUri()" decimal-input-restrictor />
+	                <br/>
+	                <br/>
+	                <a ng-href="{{deposit.btc.bitcoinUri}}">
+	                  <pumps-qr-code class="center" size="180" value="deposit.btc.bitcoinUri"></pumps-qr-code>
+	                </a>
+	              </div>
+	            </div>
+	          </div>
+	
+	          <div class="noDisp" ng-controller="walletDepositController as deposit" data-currency="ETH">
+	            <div id="deposit-eth-dialog" pumps-dialog ok-button-caption="CLOSE" cancel-button-visible="false">
+	              <h2 class="sectionHeader">DEPOSIT: ETH</h2>
+	              <p class="dialog-text">To deposit ETH to your Pumps account, please send ETH to the address below.<br/>
+	                The minimum amount of deposit is <span class="fontBold">{{deposit.eth.minimumAmount}} ETH</span>.</p>
+	              <p class="dialog-text">Please do not deposit ERC20 tokens! Only Ethereum is allowed.</p>
+	              <table class="pumpsTable bitcoin-requisites">
+	                <tbody>
+	                <tr>
+	                  <td><b>{{deposit.eth.ethereumAddress}}</b></td>
+	                </tr>
+	                </tbody>
+	              </table>
+	              <p class="dialog-text">Enter this address into your Ethereum client or wallet. Once the transaction is confirmed, <br/>
+	                the gateway will process the transfer of ETH to a token in your Pumps account.</p>
+	              <p class="dialog-text">Please note that the gateway doesn't apply any fees for this operation.</p>
+	              <div class="textCenter">
+	                <pumps-qr-code class="center" size="180" value="deposit.eth.ethereumAddress"></pumps-qr-code>
+	              </div>
+	            </div>
+	          </div>
+	
+	          <div class="noDisp" ng-controller="walletDepositController as deposit" data-currency="EUR">
+	            <div id="deposit-eur-dialog" pumps-dialog ok-button-caption="CLOSE" cancel-button-visible="false">
+	              <h2 class="sectionHeader">DEPOSIT: EUR</h2>
+	              <p class="dialog-text textCenter">VERIFICATION</p>
+	              <p class="dialog-text textCenter">
+	                In order to deposit Euros directly from your bank<br/>
+	                account through SEPA transfer you MUST get verified<br/>
+	                by our partner <a href="https://www.idnow.eu/" target="_blank">IDNow.eu</a>
+	              </p>
+	              <p class="dialog-text textCenter">
+	                <a href="https://pumpsplatform.userecho.com/topics/1303-buying-eurotoken-with-sepa-transfer/" target="_blank">Read more about SEPA transfers</a>
+	              </p>
+	              <p class="dialog-text textCenter">
+	                <a href="https://pumpsplatform.userecho.com/topics/1304-list-of-accepted-countries-and-documents-for-verification/" target="_blank">List of eligible countries and IDs</a>
+	              </p>
+	              <p class="dialog-text textCenter">
+	                In order to get verified follow the link:<br/>
+	                <a href="{{deposit.fiat.verificationLink}}" target="_blank">{{deposit.fiat.verificationLink}}</a>
+	              </p>
+	              <p class="dialog-text textCenter">We don't accept international wire transfers from US Citizens or from USA Banks</p>
+	              <br/>
+	              <p class="dialog-text textCenter">
+	                In case the link doesn't work for you,<br/>
+	                please just send an email to<br/>
+	                <span class="email"
+	                      title="Copy this address to the clipboard"
+	                      tooltipster
+	                      tooltip-theme="tooltipster-theme1"
+	                      ngclipboard
+	                      data-clipboard-text="{{deposit.fiat.email}}"
+	                      ngclipboard-success="clipboardOk()">{{deposit.fiat.email}}</span>
+	                <br/>
+	                with your Pumps wallet address as the subject
+	              </p>
+	            </div>
+	          </div>
+	
+	          <div class="noDisp" ng-controller="walletDepositController as deposit" data-currency="USD">
+	            <div id="deposit-usd-dialog" pumps-dialog ok-button-caption="CLOSE" cancel-button-visible="false">
+	              <h2 class="sectionHeader">DEPOSIT: USD</h2>
+	              <p class="dialog-text textCenter">VERIFICATION</p>
+	              <p class="dialog-text textCenter">
+	                In order to deposit USD directly from your bank<br/>
+	                account through wire transfer you MUST get verified<br/>
+	                by our partner <a href="https://www.idnow.eu/" target="_blank">IDNow.eu</a>
+	              </p>
+	              <p class="dialog-text textCenter">
+	                <a href="https://pumpsplatform.userecho.com/topics/1304-list-of-accepted-countries-and-documents-for-verification/" target="_blank">List of eligible countries and IDs</a>
+	              </p>
+	              <p class="dialog-text textCenter">
+	                In order to get verified follow the link:<br/>
+	                <a href="{{deposit.fiat.verificationLink}}" target="_blank">{{deposit.fiat.verificationLink}}</a>
+	              </p>
+	              <p class="dialog-text textCenter">We don't accept international wire transfers from US Citizens or from USA Banks</p>
+	              <br/>
+	              <p class="dialog-text textCenter">
+	                In case the link doesn't work for you,<br/>
+	                please just send an email to<br/>
+	                <span class="email"
+	                      title="Copy this address to the clipboard"
+	                      tooltipster
+	                      tooltip-theme="tooltipster-theme1"
+	                      ngclipboard
+	                      data-clipboard-text="{{deposit.fiat.email}}"
+	                      ngclipboard-success="clipboardOk()">{{deposit.fiat.email}}</span>
+	                <br/>
+	                with your Pumps wallet address as the subject
+	              </p>
+	            </div>
+	          </div>
+	
+	          <div class="noDisp" ng-controller="cardDepositController as card">
+	            <div id="card-deposit-dialog" pumps-dialog ok-button-caption="BUY" on-dialog-ok="card.redirectToMerchant(card.form)">
+	              <h2 class="sectionHeader">DEPOSIT FROM CARD: <b>{{card.crypto.shortName}}</b></h2>
+	              <p class="textCenter">Please note: the minimum amount you can pay is <b>{{card.limits.min | number:0}} {{card.payCurrency.displayName}}</b>,<br/>
+	                the maximum is <b>{{card.limits.max | number:0}} {{card.payCurrency.displayName}}</b></p>
+	              <form id="depositCalculatorForm" name="card.form" novalidate>
+	                <div layout="row">
+	                  <md-input-container>
+	                    <label>Amount you pay</label>
+	                    <input name="payAmount" ng-model="card.payAmount" type="text" ng-change="card.updateReceiveAmount()" ng-model-options="{ debounce: 250 }" decimal-input-restrictor/>
+	                  </md-input-container>
+	                  <md-input-container>
+	                    <label>Currency</label>
+	                    <md-select ng-model="card.payCurrency" ng-change="card.updateLimitsAndReceiveAmount()" width="2">
+	                      <md-optgroup label="Your card currency">
+	                        <md-option ng-value="currency" ng-repeat="currency in card.currencies">{{currency.displayName}}</md-option>
+	                      </md-optgroup>
+	                    </md-select>
+	                  </md-input-container>
+	                </div>
+	                <div layout="row">
+	                  <md-input-container>
+	                    <label>Approximate amount you get</label>
+	                    <input name="getAmount" ng-model="card.getAmount" ng-disabled="true" type="text"/>
+	                  </md-input-container>
+	                </div>
+	              </form>
+	              <div class="textCenter">
+	                <p>For making a payment from your card you will be redirected <br/> to the merchant's website.</p>
+	              </div>
+	            </div>
+	          </div>
+	
+	          <div class="flex-container">
+	            <wallet-box class="walletBox"
+	                        ng-repeat="w in walletList.wallets"
+	                        balance="w.balance"
+	                        on-send="walletList.send(w)"
+	                        on-withdraw="walletList.withdraw(w)"
+	                        on-deposit="walletList.deposit(w)"></wallet-box>
+	          </div>
+	          <pumps-transaction-history heading="LATEST TRANSACTIONS"
+	                                     transactions="walletList.transactions"
+	                                     limit-to="10"></pumps-transaction-history>
+	        </div>
+	        <!-- / WALLET TAB -->
+	
+	        <!-- PORTFOLIO TAB -->
+	        <div id="mBB-portfolio" class="mBB-content wScroll" ng-switch-when="portfolio">
+	          <div ng-controller="assetListController as assetList">
+	            <h2 class="sectionHeader">PORTFOLIO</h2>
+	            <table class="pumpsTable wScroll">
+	              <thead>
+	              <tr>
+	                <td>ASSET NAME</td>
+	                <td>ISSUER</td>
+	                <td>RE-ISSUABLE</td>
+	                <td>BALANCE</td>
+	                <td>OPTIONS</td>
+	              </tr>
+	              </thead>
+	              <tbody>
+	              <tr ng-show="assetList.noData">
+	                <td colspan="5">You do not own/have not created any assets.</td>
+	              </tr>
+	              <tr ng-show="!assetList.noData" ng-repeat="tx in assetList.assets | asset track by tx.id">
+	                <td>
+	                  <span ng-class="{verified: tx.balance.currency.verified}">{{tx.name}}</span>
+	                </td>
+	                <td>{{tx.formatted.sender}}</td>
+	                <td>{{tx.reissuable}}</td>
+	                <td>{{tx.balance | moneyShort}}</td>
+	                <td>
+	                  <button class="wButton wButton-neg fade" ng-click="assetList.assetTransfer(tx.id)">TRANSFER</button><span class="divider-2"></span>
+	                  <button class="wButton wButton-neg fade" ng-disabled="!tx.formatted.canReissue" ng-click="assetList.assetReissue(tx.id)">REISSUE</button><span class="divider-2"></span>
+	                  <button class="wButton wButton-neg fade" ng-click="assetList.assetDetails(tx.id)">DETAILS</button><span class="divider-2"></span>
+	                  <!-- TODO: remove MASS PAY feature or re-engineer it using a centralized service
+	                  <button class="wButton wButton-neg fade" ng-click="assetList.assetMassPay(tx.id)">MASS PAY</button>
+	                  -->
+	                </td>
+	              </tr>
+	              </tbody>
+	            </table>
+	            <div class="noDisp" ng-controller="assetDetailsController as details">
+	              <div id="asset-details-dialog" pumps-dialog cancel-button-visible="false">
+	                <h2 class="sectionHeader">ASSET DETAILS</h2>
+	                <table class="pumpsTable">
+	                  <thead>
+	                  <tr>
+	                    <td>FIELD</td>
+	                    <td>DESCRIPTION</td>
+	                  </tr>
+	                  </thead>
+	                  <tbody>
+	                  <tr>
+	                    <td>Issuer:</td>
+	                    <td ng-if="!details.isSenderCopiable">{{details.sender}}</td>
+	                    <td ng-if="details.isSenderCopiable"><span class="clipSpan" tooltipster tooltip-theme="tooltipster-theme1" ngclipboard data-clipboard-text="{{details.sender}}" title="Copy this address to the clipboard." ngclipboard-success="clipboardOk()">{{details.sender}}</span></td>
+	                  </tr>
+	                  <tr>
+	                    <td>Identifier:</td>
+	                    <td><span class="clipSpan" tooltipster tooltip-theme="tooltipster-theme1" ngclipboard data-clipboard-text="{{details.assetId}}" title="Copy this asset id to the clipboard." ngclipboard-success="clipboardOk()">{{details.assetId}}</span></td>
+	                  </tr>
+	
+	                  <tr>
+	                    <td>Name:</td>
+	                    <td>{{details.name}}</td>
+	                  </tr>
+	                  <tr>
+	                    <td>Details:</td>
+	                    <td>{{details.description}}</td>
+	                  </tr>
+	                  <tr>
+	                    <td>Total tokens:</td>
+	                    <td>{{details.totalTokens}}</td>
+	                  </tr>
+	                  <tr>
+	                    <td>Reissuable:</td>
+	                    <td>{{details.reissuable}}</td>
+	                  </tr>
+	                  <tr>
+	                    <td>Issue date:</td>
+	                    <td>{{details.timestamp | formatting}}</td>
+	                  </tr>
+	                  </tbody>
+	                </table>
+	              </div>
+	            </div>
+	            <div class="noDisp" ng-controller="assetTransferController as transfer">
+	              <div id="asset-transfer-dialog" pumps-dialog ok-button-caption="TRANSFER" on-dialog-ok="transfer.submitTransfer(transfer.assetForm)">
+	                <form id="transfer-asset-form" name="transfer.assetForm" novalidate ng-validate="transfer.validationOptions">
+	                  <h2 class="sectionHeader">ASSET TRANSFER</h2>
+	                  <div class="balanceAmt">
+	                    <p>Asset balance: </p><span class="balancepumps">{{transfer.availableBalance | moneyLong:true}}</span><br/>
+	                    <p>Pumps balance: </p><span class="balancepumps">{{transfer.feeAssetBalance | moneyLong:true}}</span>
+	                  </div>
+	                  <table class="pumpsTable">
+	                    <thead>
+	                    <th>DESCRIPTION</th>
+	                    <th>INPUT</th>
+	                    </thead>
+	                    <tbody>
+	                    <tr>
+	                      <td>Recipient's Address</td>
+	                      <td>
+	                        <div class="form-field">
+	                          <input class="wInput form-control" name="assetRecipient" type="text" placeholder="Recipient" ng-model="transfer.recipient" />
+	                        </div>
+	                      </td>
+	                    </tr>
+	                    <tr>
+	                      <td>Amount</td>
+	                      <td>
+	                        <div class="form-field">
+	                          <input class="wInput form-control" name="assetAmount" type="text" placeholder="Amount" ng-model="transfer.amount" decimal-input-restrictor />
+	                        </div>
+	                      </td>
+	                    </tr>
+	                    <tr>
+	                      <td>Attachment</td>
+	                      <td>
+	                        <div class="form-field">
+	                          <textarea rows="2" class="wInput form-control" name="assetAttachment" ng-model="transfer.attachment"></textarea>
+	                        </div>
+	                      </td>
+	                    </tr>
+	                    <tr>
+	                      <td>Fee</td>
+	                      <td>
+	                        <md-autocomplete md-input-name="assetFee" md-selected-item="transfer.autocomplete.selectedFee" md-search-text="transfer.autocomplete.searchText"
+	                                         md-items="item in transfer.autocomplete.querySearch(transfer.autocomplete.searchText)"
+	                                         md-item-text="item.amount.toString()" md-min-length="0" md-require-match="" md-no-cache="true"
+	                                         md-menu-class="popup-autocomplete" class="fee-autocomplete">
+	                          <md-item-template>
+	                            <span md-highlight-text="transfer.autocomplete.searchText">{{item.displayText}}</span>
+	                          </md-item-template>
+	                        </md-autocomplete>
+	                      </td>
+	                    </tr>
+	                    </tbody>
+	                  </table>
+	                </form>
+	              </div>
+	              <div id="transfer-asset-confirmation" pumps-dialog ok-button-caption="CONFIRM" ok-button-enabled="!transfer.broadcast.pending" on-dialog-ok="transfer.broadcastTransaction()">
+	                <div class="dialog-confirmation">
+	                  <p class="dialog-text">You are sending <span class="confirmation-value">{{transfer.confirm.amount | moneyLong:true}}</span> with
+	                    <span class="confirmation-value">{{transfer.confirm.fee | moneyLong:true}}</span> fee <br/>
+	                    to the address: <span class="confirmation-value">{{transfer.confirm.recipient}}</span>
+	                  </p>
+	                  <p class="dialog-text">Please <span class="fontBold"> CONFIRM </span>to execute or <span class="fontBold"> CANCEL </span> to discard.</p>
+	                </div>
+	              </div>
+	            </div>
+	            <div class="noDisp" ng-controller="assetReissueController as reissue">
+	              <div id="asset-reissue-dialog" pumps-dialog ok-button-caption="REISSUE" ok-button-enabled="!reissue.broadcast.pending" on-dialog-ok="reissue.submitReissue(reissue.assetForm)">
+	                <form id="asset-reissue-form" name="reissue.assetForm" novalidate ng-validate="reissue.validationOptions">
+	                  <h2 class="sectionHeader">ASSET REISSUE</h2>
+	                  <div class="balanceAmt">
+	                    <p>Total tokens issued: </p><span class="balancepumps">{{reissue.totalTokens.formatAmount()}}</span><br/>
+	                    <p>Pumps balance: </p><span class="balancepumps">{{reissue.pumpsBalance.formatAmount(true)}}</span>
+	                  </div>
+	                  <table class="pumpsTable">
+	                    <thead>
+	                    <tr>
+	                      <th>DESCRIPTION</th>
+	                      <th>INPUT</th>
+	                    </tr>
+	                    </thead>
+	                    <tbody>
+	                    <tr>
+	                      <td>Asset identifier</td>
+	                      <td>{{reissue.assetId}}</td>
+	                    </tr>
+	                    <tr>
+	                      <td>Asset name</td>
+	                      <td>{{reissue.assetName}}</td>
+	                    </tr>
+	
+	                    <tr>
+	                      <td>Additional amount</td>
+	                      <td>
+	                        <div class="form-field">
+	                          <input class="wInput form-control" name="assetAmount" type="text" placeholder="Amount" ng-model="reissue.amount" decimal-input-restrictor />
+	                        </div>
+	                      </td>
+	                    </tr>
+	                    <tr>
+	                      <td>Reissue enabled</td>
+	                      <td>
+	                        <div class="form-field">
+	                          <input class="wInput form-control" name="assetReissue" type="checkbox" ng-model="reissue.reissuable" />
+	                        </div>
+	                      </td>
+	                    </tr>
+	                    <tr>
+	                      <td>Fee</td>
+	                      <td>{{::reissue.fee.formatAmount(true)}} {{::reissue.fee.currency.displayName}}</td>
+	                    </tr>
+	                    </tbody>
+	                  </table>
+	                </form>
+	              </div>
+	              <div id="asset-reissue-confirm-dialog" pumps-dialog ok-button-caption="CONFIRM" ok-button-enabled="!reissue.broadcast.pending" on-dialog-ok="reissue.broadcastTransaction()">
+	                <div class="dialog-confirmation">
+	                  <p class="dialog-text">You are issuing an additional amount of <span class="confirmation-value">{{reissue.confirm.amount | moneyShort}}</span> tokens <br/>
+	                    to the asset <span class="confirmation-value">{{reissue.confirm.amount.currency}}</span>
+	                    with a fee of <span class="confirmation-value">{{reissue.confirm.fee | moneyLong:true}}</span>
+	                  </p>
+	                  <p class="dialog-text">Please <span class="fontBold"> CONFIRM </span>to execute or <span class="fontBold"> CANCEL </span> to discard.</p>
+	                </div>
+	              </div>
+	            </div>
+	            <div class="noDisp" ng-controller="massPaymentController as mass">
+	              <div id="asset-mass-pay-dialog" pumps-dialog ok-button-caption="SEND" show-buttons="false">
+	                <h2 class="sectionHeader">MASS PAYMENT</h2>
+	                <ng-switch on="mass.stage">
+	                  <p ng-if="mass.invalidPayment" class="notice-alert">{{mass.inputErrorMessage}}
+	                    Please fix the error and load the file again.</p>
+	                  <form id="massPaymentFilesForm" name="mass.form" novalidate ng-switch-when="loading" ng-validate="mass.validationOptions">
+	                    <table class="pumpsTable">
+	                      <thead>
+	                      <tr>
+	                        <th>DESCRIPTION</th>
+	                        <th>INPUT</th>
+	                      </tr>
+	                      </thead>
+	                      <tbody>
+	                      <tr>
+	                        <td>Payments file</td>
+	                        <td>
+	                          <input type="file" name="inputFile" ng-model="mass.filename" file-select file-handler="mass.handleFile(file)" accept=".json,.csv"/>
+	                        </td>
+	                      </tr>
+	                      <tr>
+	                        <td>Fee per transaction</td>
+	                        <td>
+	                          <md-autocomplete md-input-name="massPayFee" md-selected-item="mass.autocomplete.selectedFee" md-search-text="mass.autocomplete.searchText"
+	                                           md-items="item in mass.autocomplete.querySearch(mass.autocomplete.searchText)"
+	                                           md-item-text="item.amount.toString()" md-min-length="0" md-require-match="" md-no-cache="true"
+	                                           md-menu-class="popup-autocomplete" class="fee-autocomplete">
+	                            <md-item-template>
+	                              <span md-highlight-text="mass.autocomplete.searchText">{{item.displayText}}</span>
+	                            </md-item-template>
+	                          </md-autocomplete>
+	                        </td>
+	                      </tr>
+	                      </tbody>
+	                    </table>
+	                    <br/>
+	                    <ng-if ng-if="mass.loadingInProgress">
+	                      <md-progress-linear md-mode="indeterminate"></md-progress-linear>
+	                      <br/>
+	                    </ng-if>
+	                    <div class="button-row">
+	                      <button class="wButton wButton-neg" ng-disabled="mass.loadingInProgress" ng-click="mass.processInputFile(massPaymentFilesForm)">LOAD</button>
+	                    </div>
+	                  </form>
+	                  <div class="massPayRecap wScroll" ng-switch-when="processing">
+	                    <p>Please notice that only the first 10 transactions are shown below as a sample. Use the EXPORT functionality to export the full transaction details to clipboard.</p>
+	                    <p>Total transactions: {{mass.summary.totalTransactions}} | Total amount: {{mass.summary.totalAmount.toTokens()}} | Total fee: {{mass.summary.totalFee.toTokens()}}</p>
+	
+	                    <table class="pumpsTable">
+	                      <thead>
+	                      <tr>
+	                        <td>RECIPIENT</td>
+	                        <td>AMOUNT</td>
+	                      </tr>
+	                      </thead>
+	                      <tbody>
+	                      <tr ng-repeat="transfer in mass.transfers track by $index">
+	                        <td>{{transfer.recipient}}</td>
+	                        <td>{{transfer.amount}}</td>
+	                      </tr>
+	                      </tbody>
+	                    </table>
+	                    <br/>
+	                    <div class="button-row">
+	                      <button class="wButton wButton-neg fade" ngclipboard ngclipboard-text-provider="mass.transactionsToClipboard()" ngclipboard-success="mass.dataCopied()">EXPORT</button><span class="divider-2"></span>
+	                      <button class="wButton wButton-neg fade" ng-click="mass.submitPayment()">SEND</button><span class="divider-2"></span>
+	                      <button class="wButton wButton-neg fade" ng-click="mass.cancel()">CANCEL</button>
+	                    </div>
+	                  </div>
+	                </ng-switch>
+	              </div>
+	              <div id="asset-mass-pay-confirmation" pumps-dialog ok-button-caption="CONFIRM" ok-button-enabled="!mass.broadcast.pending" on-dialog-ok="mass.broadcastTransaction()">
+	                <div class="dialog-confirmation">
+	                  <p class="dialog-text">You are sending <span class="confirmation-value">{{mass.confirm.amount | moneyLong:true}}</span> with
+	                    <span class="confirmation-value">{{mass.confirm.fee | moneyLong:true}}</span> total fee <br/>
+	                    to <span class="confirmation-value">{{mass.confirm.recipients}}</span> recipients.
+	                  </p>
+	                  <p class="dialog-text">Please <span class="fontBold"> CONFIRM </span>to execute or <span class="fontBold"> CANCEL </span> to discard.</p>
+	                </div>
+	              </div>
+	            </div>
+	          </div>
+	        </div>
+	        <!-- / PORTFOLIO TAB -->
+	
+	        <!-- DEX TAB -->
+	        <pumps-page ng-switch-when="exchange" page-title="DEX">
+	          <pumps-dex></pumps-dex>
+	        </pumps-page>
+	        <!-- / DEX TAB -->
+	
+	        <!-- LEASING TAB -->
+	        <pumps-page ng-switch-when="leasing" page-title="Leasing">
+	          <pumps-leasing></pumps-leasing>
+	        </pumps-page>
+	        <!-- / LEASING TAB -->
+	
+	        <!-- VOTING TAB -->
+	        <div id="mBB-voting" class="mBB-content" ng-switch-when="voting">
+	          <div class="phContent">
+	            <h1>DECENTRALIZED VOTING</h1>
+	            <br/>
+	            <p>With a fair and automated system, Pumps' voting area enables communities and projects to achieve consensus for critical decision-making that might otherwise prove difficult or controversial. A full set of analytic tools will also be available to follow up the voting process in real time.
+	
+	
+	        <div id="mBB-token" class="mBB-content" ng-switch-when="tokens">
+	
+	          <div ng-controller="tokenCreateController as ctrl">
+	            <h2 class="sectionHeader">TOKEN Addition Tab</h2>
+	            <form id="create-asset-form" name="createAssetForm" novalidate ng-validate="ctrl.issuanceValidationOptions" ng-submit="ctrl.assetIssueConfirmation(createAssetForm, $event)">
+	              <div class="balanceAmt">
+	                <p>Pumps balance: </p><span class="balancepumps">{{ctrl.pumpsBalance | moneyLong:true}}</span>
+	              </div>
+	              <table class="pumpsTable">
+	                <thead>
+	                <tr>
+	                  <td>DESCRIPTION</td>
+	                  <td>INPUT</td>
+	                </tr>
+	                </thead>
+	                <tbody>
+	                <tr>
+	                  <td><label for="assetName">Name</label></td>
+	                  <td><input id="assetName" name="assetName" type="text" class="wInput form-control" focus-me="true" ng-model="ctrl.asset.name" tooltipster tooltip-theme="tooltipster-theme1" tooltip-html title="This field defines the NAME of your<br/>token.<br/><br/>It can contain up to 16 alphanumeric<br/>characters."/></td>
+	                </tr><br/>
+	                <tr>
+	                  <td><label for="assetDescription">Token Creator Address</label></td>
+	                  <td><textarea id="assetDescription" name="assetDescription" class="wInput" rows="3" ng-model="ctrl.asset.description" tooltipster tooltip-theme="tooltipster-theme1" tooltip-html title="Token address used in creating the token.<br/>"></textarea></td>
+	                </tr>
+	                <tr>
+	                  <td><label for="assetTotalTokens">Total Tokens</label></td>
+	                  <td><input id="assetTotalTokens" name="assetTotalTokens" class="wInput" type="text" ng-model="ctrl.asset.totalTokens" integer-input-restrictor tooltipster tooltip-theme="tooltipster-theme1" tooltip-html title="This field defines the TOTAL TOKENS<br/>supply."/></td>
+	            
+	      td><label for="assetTotalTokens">Token Platform</label></td>          <tr>
+<td><input id="assetTotalTokens" name="assetTokensplatform"
+<div class="container">
+  <h2>Form control: inline radio buttons</h2>
+  <p>The form below contains three inline radio buttons:</p>
+  <form>
+    <label class="radio-inline">
+      <input type="radio" name="optradio">Counterparty Token
+    </label>
+    <label class="radio-inline">
+      <input type="radio" name="optradio">Etherum Token </label>
+    <label class="radio-inline">
+      <input type="radio" name="optradio" Waves Token
+    </label>
+<label class="radio-inline">
+      <input type="radio" name="optradio">Ubiq Token </label>
+  </form>
+<label class="radio-inline">
+      <input type="radio" name="optradio">Neo Token </label>
+
+</div>
+	                  <td><label for="assetTokenDecimalPlaces">Token Decimals</label></td>
+	                  <td><input id="assetTokenDecimalPlaces" name="assetTokenDecimalPlaces" class="wInput" type="text" ng-model="ctrl.asset.decimalPlaces" integer-input-restrictor tooltipster tooltip-theme="tooltipster-theme1" tooltip-html title="This field defines the number of DECIMALS<br/>your tokens has been divided in.<br/><br/>
+	                </tr>
+	                <tr>
+	
+	
+	
+	
+	                  <td>Fee</td>
+	                  <td tooltipster tooltip-theme="tooltipster-theme1" tooltip-html title="The FEE you will be charged<br/>for this process.">{{::ctrl.asset.fee.formatAmount(true)}} {{::ctrl.asset.fee.currency.displayName}}</td>
+	                </tr>
+	                </tbody>
+	              </table>
+	              <div>
+	                <button class="wButton wButton-neg fade" type="submit">SUBMIT</button><span class="divider-2"></span>
+	                <button class="wButton wButton-neg fade" type="button" ng-click="ctrl.resetForm()">CLEAR</button>
+	              </div>
+	            </form>
+	
+	            <div id="create-asset-confirmation" pump-dialog ok-button-caption="CONFIRM" ok-button-enabled="!ctrl.broadcast.pending" on-dialog-ok="ctrl.broadcastIssueTransaction()">
+	              <div class="dialog-confirmation">
+	                <p class="dialog-text">You are adding a <span class="confirmation-value">{{ctrl.confirm.reissuable}}</span> token named
+	                  <span class="confirmation-value">{{ctrl.confirm.name}}</span><br/> with
+	                  <span class="confirmation-value">{{ctrl.confirm.totalTokens}}</span> of total tokens amount
+	                </p>
+	
+	
+	                <p class="dialog-text">Please <span class="fontBold"> CONFIRM </span>to execute or <span class="fontBold"> CANCEL </span> to discard.</p>
+	              </div>
+	            </div>
+	          </div>
+	        </div>
+	       
+
+	
+	    </section>
+	  </div>
+	
+	
+	<!-- JAVASCRIPT BEGIN -->
+	<script src="../js/bundle.js"></script>
+	<script src="../js/templates.js"></script>
+	<!-- JAVASCRIPT END -->
+	
+	</body>
+	</html>
+
