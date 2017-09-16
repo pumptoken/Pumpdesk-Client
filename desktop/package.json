@@ -1,0 +1,7 @@
+{
+  "name": "Pumpdesktop client",
+  "version": "0.0.1",
+  "description": "Desktop Client For Pump Platform",
+  "license": "Apache-2.0",
+  "main": "main.js"
+}
